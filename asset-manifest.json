@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/plot_analyzer/static/css/main.189ee34f.css",
+    "main.js": "/plot_analyzer/static/js/main.8b4bdce2.js",
+    "static/js/453.9401410c.chunk.js": "/plot_analyzer/static/js/453.9401410c.chunk.js",
+    "index.html": "/plot_analyzer/index.html",
+    "main.189ee34f.css.map": "/plot_analyzer/static/css/main.189ee34f.css.map",
+    "main.8b4bdce2.js.map": "/plot_analyzer/static/js/main.8b4bdce2.js.map",
+    "453.9401410c.chunk.js.map": "/plot_analyzer/static/js/453.9401410c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.189ee34f.css",
+    "static/js/main.8b4bdce2.js"
+  ]
+}
