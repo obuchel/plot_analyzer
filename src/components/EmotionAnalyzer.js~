@@ -1,0 +1,235 @@
+/**
+ * Pure JavaScript implementation of emotion analysis using ONNX Runtime Web
+ * This matches the output format of the Python implementation
+ */
+
+import * as ort from 'onnxruntime-web';
+// Import vocab directly from local file
+import VOCAB from './vocab.json';
+
+// Constants matching the Python implementation exactly
+const EMOTION_LABELS = ['anger', 'disgust', 'fear', 'joy', 'neutral', 'sadness', 'surprise'];
+
+// Path to your exported model - update this to point to your ONNX model
+const MODEL_URL = 'https://huggingface.co/obuchel1/quantized_emotion_model1/resolve/main/emotion_model.onnx';
+
+// Optional color map for visualization
+const EMOTION_COLORS = {
+  'anger': '#e53935',    // Red
+  'disgust': '#8bc34a',  // Green
+  'fear': '#9c27b0',     // Purple
+  'joy': '#ffc107',      // Yellow
+  'neutral': '#78909c',  // Blue-gray
+  'sadness': '#3f51b5',  // Indigo
+  'surprise': '#ff9800'  // Orange
+};
+
+// Load session once and cache it
+let sessionPromise = null;
+
+/**
+ * Load the ONNX model as a singleton
+ * @returns {Promise<ort.InferenceSession>} The ONNX model session
+ */
+async function getSession() {
+  if (!sessionPromise) {
+    // Initialize session only once
+    sessionPromise = (async () => {
+      // Configure ONNX runtime
+      ort.env.wasm = { numThreads: 1, simd: true };
+      
+      try {
+        // Fetch the model
+        const response = await fetch(MODEL_URL);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch model: ${response.status} ${response.statusText}`);
+        }
+        
+        const modelArrayBuffer = await response.arrayBuffer();
+        
+        // Create the session
+        const sessionOptions = { executionProviders: ['wasm'] };
+        return await ort.InferenceSession.create(modelArrayBuffer, sessionOptions);
+      } catch (error) {
+        console.error("Failed to load ONNX model:", error);
+        sessionPromise = null; // Allow retry
+        throw error;
+      }
+    })();
+  }
+  
+  return sessionPromise;
+}
+
+/**
+ * RoBERTa tokenizer implementation using the vocab.json file
+ * This is a more accurate implementation focusing on single tokens
+ * @param {string} text - The text to tokenize
+ * @returns {Object} The tokenized text with input_ids and attention_mask
+ */
+function tokenize(text) {
+  // Start with BOS token (0)
+  const inputIds = [0]; 
+  const attentionMask = [1];
+  
+  // RoBERTa uses byte-level BPE tokenization
+  // It expects spaces to be explicitly marked at the start of tokens
+  
+  // Step 1: Add a space at the beginning of the text (RoBERTa style)
+  const spacedText = " " + text.trim();
+  
+  // Step 2: Walk through the text character by character, 
+  // looking for the longest token match at each position
+  let pos = 0;
+  while (pos < spacedText.length) {
+    let endPos = spacedText.length;
+    let foundToken = false;
+    
+    // Try to find the longest token starting at this position
+    while (endPos > pos && !foundToken) {
+      const slice = spacedText.slice(pos, endPos);
+      
+      if (VOCAB[slice] !== undefined) {
+        // Found a token in the vocabulary
+        inputIds.push(VOCAB[slice]);
+        attentionMask.push(1);
+        pos = endPos;
+        foundToken = true;
+      } else {
+        // Try a shorter substring
+        endPos--;
+      }
+    }
+    
+    // If no token was found, use the unknown token and advance by one character
+    if (!foundToken) {
+      inputIds.push(3);  // Common unknown token ID for RoBERTa
+      attentionMask.push(1);
+      pos++;
+    }
+    
+    // Safety check: if we've already added too many tokens, stop
+    if (inputIds.length > 126) {  // 128 - 2 for BOS and EOS
+      break;
+    }
+  }
+  
+  // Add EOS token (2)
+  inputIds.push(2);
+  attentionMask.push(1);
+  
+  return {
+    input_ids: [inputIds],
+    attention_mask: [attentionMask]
+  };
+}
+
+/**
+ * Softmax function to convert logits to probabilities
+ * @param {Array<number>} logits - The logits from the model
+ * @returns {Array<number>} The probabilities
+ */
+function softmax(logits) {
+  const maxLogit = Math.max(...logits);
+  const expValues = logits.map(val => Math.exp(val - maxLogit));
+  const sumExp = expValues.reduce((sum, val) => sum + val, 0);
+  return expValues.map(val => val / sumExp);
+}
+
+/**
+ * Analyze the emotion in text
+ * @param {string} text - The text to analyze
+ * @returns {Promise<Object>} The emotion analysis result
+ */
+async function analyzeEmotion(text) {
+  try {
+    // Get the model session
+    const session = await getSession();
+    
+    // Tokenize the input
+    const tokens = tokenize(text);
+    
+    // For debugging - log the tokens
+    console.log("Tokenized text:", tokens.input_ids[0]);
+    
+    // Create tensors
+    const inputIdsTensor = new ort.Tensor(
+      'int64',
+      new BigInt64Array(tokens.input_ids[0].map(id => BigInt(id))),
+      [1, tokens.input_ids[0].length]
+    );
+    
+    const attentionMaskTensor = new ort.Tensor(
+      'int64',
+      new BigInt64Array(tokens.attention_mask[0].map(mask => BigInt(mask))),
+      [1, tokens.attention_mask[0].length]
+    );
+    
+    // Create feeds for the model
+    const feeds = {
+      input_ids: inputIdsTensor,
+      attention_mask: attentionMaskTensor
+    };
+    
+    // Run inference
+    const results = await session.run(feeds);
+    
+    // Get the logits (debug the key names if needed)
+    console.log("Output keys:", Object.keys(results));
+    const outputTensor = results.logits || results.output || Object.values(results)[0];
+    const logits = Array.from(outputTensor.data);
+    
+    // Log raw logits for debugging
+    console.log("Raw logits:", logits.slice(0, EMOTION_LABELS.length));
+    
+    // Convert to probabilities
+    const probabilities = softmax(logits.slice(0, EMOTION_LABELS.length));
+    
+    // Log probabilities for debugging
+    console.log("Probabilities:", 
+      EMOTION_LABELS.map((label, i) => `${label}: ${(probabilities[i] * 100).toFixed(2)}%`).join(", ")
+    );
+    
+    // Find the predicted class (highest probability)
+    const predictedIndex = probabilities.indexOf(Math.max(...probabilities));
+    const predictedEmotion = EMOTION_LABELS[predictedIndex];
+    
+    // Create emotion probabilities object to match Python output format
+    const emotionProbs = {};
+    EMOTION_LABELS.forEach((label, i) => {
+      emotionProbs[label] = probabilities[i];
+    });
+    
+    // Return the result in the same format as the Python implementation
+    return {
+      predicted_emotion: predictedEmotion,
+      probabilities: emotionProbs
+    };
+    
+  } catch (error) {
+    console.error("Emotion analysis failed:", error);
+    throw new Error(`Emotion analysis failed: ${error.message}`);
+  }
+}
+
+// Export everything needed for direct use
+export {
+  analyzeEmotion,
+  EMOTION_LABELS,
+  EMOTION_COLORS
+};
+
+// Example usage:
+// 
+// // 1. Optionally load tokenizer resources (better accuracy)
+// loadTokenizerResources('/path/to/vocab.json', '/path/to/merges.txt')
+//   .then(() => console.log('Tokenizer ready'))
+//   .catch(err => console.error('Tokenizer resources not loaded:', err));
+//
+// // 2. Analyze text
+// analyzeEmotion('I feel really happy today!')
+//   .then(result => {
+//     console.log(`Predicted emotion: ${result.predicted_emotion}`);
+//     console.log(`Confidence: ${result.probabilities[result.predicted_emotion]}`);
+//   })
+//   .catch(err => console.error('Analysis failed:', err));

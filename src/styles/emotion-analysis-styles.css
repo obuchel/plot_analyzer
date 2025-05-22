@@ -1,0 +1,549 @@
+/* Enhanced emotion analysis styles */
+
+.emotion-analyzer {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.analyzing-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  color: #666;
+  font-style: italic;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  border-radius: 50%;
+  border-top-color: #333;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.emotion-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.emotion-summary h3 {
+  margin: 0;
+  margin-right: 20px;
+}
+
+.dominant-emotion, .tension-score {
+  margin-right: 20px;
+  font-size: 16px;
+}
+
+.emotion-bars {
+  margin-bottom: 20px;
+}
+
+.emotion-bar-container, 
+.feature-bar-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.emotion-label, 
+.feature-label {
+  width: 100px;
+  font-size: 14px;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.bar-container {
+  flex-grow: 1;
+  height: 20px;
+  background-color: #eee;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.emotion-bar, 
+.feature-bar {
+  height: 100%;
+  border-radius: 3px;
+}
+
+.emotion-value, 
+.feature-value {
+  width: 40px;
+  text-align: right;
+  font-size: 14px;
+  padding-left: 10px;
+}
+
+.settings-toggle, 
+.reanalyze-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.settings-toggle:hover, 
+.reanalyze-button:hover {
+  background-color: #357abD;
+}
+
+.emotion-settings {
+  margin-top: 15px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+}
+
+.emotion-settings h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.setting-slider {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.setting-slider label {
+  width: 180px;
+  font-size: 14px;
+}
+
+.setting-slider input {
+  flex-grow: 1;
+  margin: 0 10px;
+}
+
+.setting-slider span {
+  width: 40px;
+  text-align: right;
+  font-size: 14px;
+}
+
+.reanalyze-button {
+  margin-top: 15px;
+}
+
+/* Tension Visualizer Styles */
+.tension-visualizer {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.tension-chart {
+  position: relative;
+  height: 300px;
+  margin: 20px 0;
+  padding-bottom: 40px;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+}
+
+.tension-line {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.tension-point {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, 50%);
+  z-index: 2;
+  cursor: pointer;
+}
+
+.narrative-stages {
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+}
+
+.stage-marker {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: 12px;
+}
+
+.stage-label {
+  transform: rotate(-45deg);
+  transform-origin: left top;
+  white-space: nowrap;
+}
+
+.tension-scale {
+  position: absolute;
+  left: -40px;
+  top: 0;
+  height: 100%;
+}
+
+.scale-marker {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: 12px;
+  color: #666;
+}
+
+.segment-tension-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.segment-tension-item {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  font-size: 14px;
+}
+
+.segment-number {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.segment-stage {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 5px;
+}
+
+/* Story Segmenter Styles */
+.story-segmenter {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.segmentation-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.segment-method {
+  display: flex;
+  align-items: center;
+}
+
+.segment-method label {
+  margin-right: 10px;
+}
+
+.segment-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.segment-button:hover {
+  background-color: #357abD;
+}
+
+.segment-button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}
+
+.segment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.segment-item {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.segment-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.segment-number {
+  font-weight: bold;
+}
+
+.segment-emotion, 
+.segment-tension {
+  font-size: 14px;
+}
+
+.segment-content {
+  margin-bottom: 10px;
+}
+
+.segment-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.emotion-change {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.change-indicator {
+  height: 8px;
+  margin-left: 10px;
+  border-radius: 4px;
+}
+
+/* Character-Danger Proximity Analyzer Styles */
+.proximity-analyzer {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.proximity-score {
+  margin-bottom: 15px;
+}
+
+.score-indicator {
+  height: 10px;
+  margin-top: 5px;
+  border-radius: 5px;
+}
+
+.proximity-instances {
+  margin-top: 20px;
+}
+
+.proximity-instance {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.instance-score {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.instance-content {
+  margin-bottom: 10px;
+}
+
+.instance-content p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.instance-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.instance-characters, 
+.instance-dangers {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Linguistic Feature Analyzer Styles */
+.linguistic-analyzer {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.feature-explanation {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.feature-explanation h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.feature-explanation ul {
+  padding-left: 20px;
+}
+
+.feature-explanation li {
+  margin-bottom: 5px;
+}
+
+/* Integration styles */
+.narrative-analysis-dashboard {
+  margin: 20px 0;
+}
+
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.analysis-controls {
+  display: flex;
+  gap: 15px;
+}
+
+.analysis-tab-container {
+  margin-bottom: 20px;
+}
+
+.analysis-tabs {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 15px;
+}
+
+.analysis-tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background-color: #f0f0f0;
+  margin-right: 5px;
+}
+
+.analysis-tab.active {
+  background-color: #fff;
+  border-color: #ddd;
+  margin-bottom: -1px;
+}
+
+.analysis-panel {
+  display: none;
+}
+
+.analysis-panel.active {
+  display: block;
+}
+
+.example-texts {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+}
+
+.example-texts h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.example-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.example-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.example-button:hover {
+  background-color: #357abD;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .segmentation-controls,
+  .emotion-summary,
+  .analysis-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .setting-slider {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .setting-slider label {
+    width: 100%;
+    margin-bottom: 5px;
+  }
+  
+  .setting-slider input {
+    width: 100%;
+    margin: 5px 0;
+  }
+  
+  .analysis-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .analysis-tab {
+    flex: 1;
+    min-width: 100px;
+    text-align: center;
+  }
+}
